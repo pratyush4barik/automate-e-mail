@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from sqlalchemy.dialects.postgresql import UUID
-from database import Base
+from backend.app.database.database import Base
 import uuid
 from datetime import datetime, timezone
 
@@ -55,6 +55,16 @@ class User(Base):
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
         nullable=False
+    )
+
+    otp = Column(
+        String(6),
+        nullable=True
+    )
+
+    otp_expires_at = Column(
+        DateTime(timezone=True),
+        nullable=True
     )
 
     def __repr__(self):

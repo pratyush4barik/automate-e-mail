@@ -3,21 +3,18 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import JWTError
-from player import player, is_paused    
-import vlc
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from starlette.requests import Request
-
-from database import get_db
-from models import GoogleUser, User
-from schemas import (
+from backend.app.database.database import get_db
+from backend.app.database.models import User
+from backend.app.database.schemas import (
     RegisterRequest,
     LoginRequest,
     UserResponse,
     TokenResponse
 )
-from security import (
+from backend.app.security.security import (
     hash_password,
     verify_password,
     create_access_token,
@@ -160,113 +157,4 @@ def get_me(
     return current_user
 
 
-@router.post("/toggle")
-def toggle():
-    global is_paused
-    state = player.get_state()
-    if state in [
-        vlc.State.NothingSpecial,
-        vlc.State.Stopped,
-        vlc.State.Ended
-    ]:
-        player.play()
-        is_paused = False
-        
-    elif state == vlc.State.Playing:
-        player.pause()
-        is_paused = True
-        
-    elif state == vlc.State.Paused:
-        player.pause()
-        is_paused = False
 
-    return {
-        "playing" : not is_paused
-    }
-
-@router.post("/forward")
-def forward():
-    current = player.get_time()
-    player.set_time(current + 5000)
-    return {"success": True}
-
-@router.post("/backward")
-def backward():
-    current = player.get_time()
-    player.set_time(current - 5000)
-    return {"success": True}
-
-@router.post("/stop")
-def stop():
-    player.stop()
-    return {"success": True}
-
-oauth = OAuth()
-
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-
-oauth.register(
-    name="google",
-    client_id=GOOGLE_CLIENT_ID,
-    client_secret=GOOGLE_CLIENT_SECRET,
-    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
-    client_kwargs={
-        "scope": "openid email profile"
-    },
-)
-
-@router.get("/google/login")
-async def google_login(request: Request):
-
-    redirect_uri = request.url_for("google_callback")
-
-    return await oauth.google.authorize_redirect(
-        request,
-        redirect_uri
-    )
-
-
-@router.get("/google/callback")
-async def google_callback(
-    request: Request,
-    db: Session = Depends(get_db)
-):
-    token = await oauth.google.authorize_access_token(request)
-
-    user_info = token["userinfo"]
-
-    google_id = user_info["sub"]
-    email = user_info["email"]
-    name = user_info["name"]
-    picture = user_info["picture"]
-
-    # Write the login flow here
-    user = db.query(GoogleUser).filter(
-        GoogleUser.google_id == google_id
-    ).first()
-
-    if not user:
-        user = GoogleUser(
-            google_id=google_id,
-            email=email,
-            name=name,
-            profile_picture=picture,
-        )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-
-    jwt = create_access_token(
-        data={"sub": str(user.id)}
-
-    )
-
-    return RedirectResponse(
-        f"https://tiny-root-360385.framer.app"
-    )

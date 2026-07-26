@@ -4,11 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.sessions import SessionMiddleware
 
-from database import Base, engine
-from auth import router as auth_router
+from backend.app.database.database import Base, engine
+from routers.auth import router as auth_router
+from backend.app.routers.otp import router as otp_router
+from routers.google_auth import router as google_auth_router
+from routers.music import router as music_router
 
 # Import models so SQLAlchemy knows about them
-import models
+import backend.app.database.models as models
 import os
 
 from dotenv import load_dotenv
@@ -88,4 +91,22 @@ app.include_router(
     auth_router,
     prefix="/auth",
     tags=["Authentication"]
+)
+
+app.include_router(
+    otp_router,
+    prefix="/otp",
+    tags=["OTP"]
+)
+
+app.include_router(
+    google_auth_router,
+    prefix="/google",
+    tags=["Google Authentication"]
+)
+
+app.include_router(
+    music_router,
+    prefix="/music",
+    tags=["Music"]
 )
