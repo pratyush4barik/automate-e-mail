@@ -3,15 +3,16 @@ from dotenv import load_dotenv
 import os
 from authlib.integrations.starlette_client import OAuth
 from starlette.requests import Request
-from backend.app.database.database import get_db
-from backend.app.database.models import GoogleUser
-from backend.app.security.security import create_access_token
+from database.database import get_db
+from database.models import GoogleUser
+from security.security import create_access_token
 from sqlalchemy.orm import Session
 from fastapi.responses import RedirectResponse
 
 
 load_dotenv()
 oauth = OAuth()
+
 router = APIRouter()
 
 
@@ -27,7 +28,7 @@ oauth.register(
         "scope": "openid email profile"
     },
 )
-
+#login route for google auth
 @router.get("/login")
 async def google_login(request: Request):
 
@@ -38,7 +39,7 @@ async def google_login(request: Request):
         redirect_uri
     )
 
-
+#login callback route for google auth
 @router.get("/callback")
 async def google_callback(
     request: Request,

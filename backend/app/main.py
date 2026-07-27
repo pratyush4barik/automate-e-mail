@@ -4,14 +4,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.sessions import SessionMiddleware
 
-from backend.app.database.database import Base, engine
+from database.database import Base, engine
 from routers.auth import router as auth_router
-from backend.app.routers.otp import router as otp_router
+from routers.otp import router as otp_router
 from routers.google_auth import router as google_auth_router
 from routers.music import router as music_router
+from routers.user_details import router as user_details_router
+from routers.email import router as email_router
 
 # Import models so SQLAlchemy knows about them
-import backend.app.database.models as models
+import database.models as models
 import os
 
 from dotenv import load_dotenv
@@ -109,4 +111,16 @@ app.include_router(
     music_router,
     prefix="/music",
     tags=["Music"]
+)
+
+app.include_router(
+    user_details_router,
+    prefix="/user-details",
+    tags=["User Details"]
+)
+
+app.include_router(
+    email_router,
+    prefix="/email",
+    tags=["Email"]
 )

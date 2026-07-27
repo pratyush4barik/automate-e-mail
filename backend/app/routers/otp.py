@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from backend.app.database.database import get_db
+from database.database import get_db
 import random
 import string
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
-from backend.app.database.models import User
+from database.models import User
 import os
 import resend
 

@@ -6,15 +6,15 @@ from jose import JWTError
 from authlib.integrations.starlette_client import OAuth
 from starlette.config import Config
 from starlette.requests import Request
-from backend.app.database.database import get_db
-from backend.app.database.models import User
-from backend.app.database.schemas import (
+from database.database import get_db
+from database.models import User
+from database.schemas import (
     RegisterRequest,
     LoginRequest,
     UserResponse,
     TokenResponse
 )
-from backend.app.security.security import (
+from security.security import (
     hash_password,
     verify_password,
     create_access_token,

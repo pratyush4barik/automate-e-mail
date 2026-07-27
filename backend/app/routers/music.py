@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from backend.app.music_system.player import player, is_paused    
+from music_system.player import player, is_paused    
 import vlc
 
 router = APIRouter()

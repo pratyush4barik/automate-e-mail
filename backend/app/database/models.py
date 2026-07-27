@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Float
 from sqlalchemy.dialects.postgresql import UUID
-from backend.app.database.database import Base
+from database.database import Base
 import uuid
 from datetime import datetime, timezone
 
@@ -84,3 +84,33 @@ class GoogleUser(Base):
 
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime, default=datetime.utcnow)
+
+class UserDetails(Base):
+    __tablename__ = "user_details"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=True)
+    college = Column(String, nullable=True)
+    degree = Column(String, nullable=True)
+    branch = Column(String, nullable=True)
+    resume_link = Column(String, nullable=True)
+    github_link = Column(String, nullable=True)
+    linkedin_link = Column(String, nullable=True)
+    drive_link = Column(String, nullable=True)
+    roll_number = Column(String, nullable=True)
+    year = Column(String, nullable=True)
+    cgpa = Column(Float, nullable=True)
+    skills = Column(String, nullable=True)
+    projects = Column(String, nullable=True)
+    research_interests = Column(String, nullable=True)
+
+class Email(Base):
+    __tablename__ = "emails"
+
+    id = Column(Integer, primary_key=True, index=True)
+    chat_id = Column(Integer, nullable=False)
+    email = Column(String, unique=True, nullable=False, index=True)
+    subject = Column(String, nullable=True)
+    body = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
